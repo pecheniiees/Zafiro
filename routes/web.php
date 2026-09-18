@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\ClubZoneController;
 use App\Http\Controllers\ClubComputerController;
+use App\Http\Controllers\ClubMemberController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\WarehouseController;
@@ -24,14 +26,16 @@ Route::middleware('guest')->group(function () {
 
 // Protected routes
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('/warehouse', WarehouseController::class)->name('warehouse');
+    Route::get('/club-members', [ClubMemberController::class, 'index'])->name('club-members.index');
+    Route::post('/club-members', [ClubMemberController::class, 'store'])->name('club-members.store');
     Route::resource('/club-map', ClubZoneController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::post('/club-map/{clubMap}/computers', [ClubZoneController::class, 'storeComputer'])->name('club-map.computers.store');
     Route::patch('/club-map/{clubMap}/layout', [ClubZoneController::class, 'updateLayout'])->name('club-map.layout');
     Route::post('/club-map/align', [ClubZoneController::class, 'align'])->name('club-map.align');
+    Route::put('/club-computers/{clubComputer}', [ClubComputerController::class, 'update'])->name('club-computers.update');
     Route::patch('/club-computers/{clubComputer}/layout', ClubComputerController::class)->name('club-computers.layout');
     Route::post('/club-computers/control', [ClubComputerController::class, 'control'])->name('club-computers.control');
     Route::post('/warehouse/stock-movements', StockMovementController::class)
@@ -54,6 +58,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/club', [SettingsController::class, 'club'])->name('settings.club');
 
     Route::get('/settings/finances', [SettingsController::class, 'finances'])->name('settings.finances');
+
+    Route::get('/settings/tariffs', [SettingsController::class, 'tariffs'])->name('settings.tariffs');
 
     Route::get('/settings/guests', [SettingsController::class, 'guests'])->name('settings.guests');
 

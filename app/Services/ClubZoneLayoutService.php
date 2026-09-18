@@ -3,16 +3,17 @@
 namespace App\Services;
 
 use App\Models\ClubZone;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class ClubZoneLayoutService
 {
-    public function align(): void
+    public function align(HasMany $zones): void
     {
-        DB::transaction(function (): void {
+        DB::transaction(function () use ($zones): void {
             $placed = [];
 
-            ClubZone::query()->orderBy('position_y')->orderBy('position_x')->orderBy('id')->lockForUpdate()->get()
+            $zones->getQuery()->orderBy('position_y')->orderBy('position_x')->orderBy('id')->lockForUpdate()->get()
                 ->each(function (ClubZone $zone) use (&$placed): void {
                     $width = max(180, (int) round($zone->width / 20) * 20);
                     $height = max(140, (int) round($zone->height / 20) * 20);

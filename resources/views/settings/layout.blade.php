@@ -18,6 +18,9 @@
                 <a href="{{ route('settings.finances') }}" class="block w-full text-left px-4 py-3 rounded-lg {{ request()->routeIs('settings.finances') ? 'bg-purple-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }} font-medium transition">
                     Финансы
                 </a>
+                <a href="{{ route('settings.tariffs') }}" class="block w-full text-left px-4 py-3 rounded-lg {{ request()->routeIs('settings.tariffs') ? 'bg-purple-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }} font-medium transition">
+                    Тарифы
+                </a>
                 <a href="{{ route('settings.guests') }}" class="block w-full text-left px-4 py-3 rounded-lg {{ request()->routeIs('settings.guests') ? 'bg-purple-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }} font-medium transition">
                     Гости
                 </a>

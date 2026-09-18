@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ClubComputer;
 use App\Models\ClubZone;
 
 class ClubZoneComputerService
@@ -16,7 +17,7 @@ class ClubZoneComputerService
             $zone->computers()->firstOrCreate(
                 ['number' => $number],
                 [
-                    'status' => 'available',
+                    'status' => ClubComputer::STATUS_OFF,
                     'position_x' => 5 + (($index % 6) * 47),
                     'position_y' => 5 + ((int) floor($index / 6) * 42),
                 ],

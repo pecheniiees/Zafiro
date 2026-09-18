@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateDashboardForUserAction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -52,7 +54,7 @@ class AuthController extends Controller
     /**
      * Handle registration
      */
-    public function register(Request $request)
+    public function register(Request $request, CreateDashboardForUserAction $createDashboard)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -68,11 +70,17 @@ class AuthController extends Controller
             'password.confirmed' => 'Пароли не совпадают.',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $user = DB::transaction(function () use ($validated, $createDashboard): User {
+            $user = User::create([
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $createDashboard->handle($user);
+
+            return $user;
+        });
 
         Auth::login($user);
 

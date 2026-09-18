@@ -2,50 +2,151 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateDashboardForUserAction;
+use App\Models\Dashboard;
+use App\Services\SettingsService;
+use App\Services\TariffApiService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 class SettingsController extends Controller
 {
-    public function club()
+    public function __construct(private CreateDashboardForUserAction $createDashboard) {}
+
+    public function club(Request $request): View
     {
-        return view('settings.club', ['settings' => $this->loadSettings()]);
+        return view('settings.club', ['settings' => SettingsService::load($this->dashboard($request))]);
     }
 
-    public function finances()
+    public function finances(Request $request): View
     {
-        return view('settings.finances', ['settings' => $this->loadSettings()]);
+        return view('settings.finances', ['settings' => SettingsService::load($this->dashboard($request))]);
     }
 
-    public function guests()
+    public function tariffs(Request $request): View
     {
-        return view('settings.guests', ['settings' => $this->loadSettings()]);
+        $dashboard = $this->dashboard($request);
+
+        return view('settings.tariffs', [
+            'settings' => SettingsService::load($dashboard),
+            'zones' => $dashboard->clubZones()->whereHas('computers')->orderBy('sort_order')->orderBy('id')->get(),
+        ]);
     }
 
-    public function api()
+    public function guests(Request $request): View
     {
-        $settings = $this->loadSettings();
+        return view('settings.guests', ['settings' => SettingsService::load($this->dashboard($request))]);
+    }
+
+    public function api(Request $request, TariffApiService $tariffs): View
+    {
+        $dashboard = $this->dashboard($request);
+        $settings = SettingsService::load($dashboard);
         $endpoints = [];
+
+        $hiddenSettingEndpoints = [
+            'tariffs.standard_hour_price',
+            'tariffs.vip_hour_price',
+            'tariffs.night_package_price',
+            'tariffs.minimum_session_minutes',
+            'tariffs.zones',
+        ];
 
         foreach ($settings as $section => $sectionSettings) {
             foreach ($sectionSettings as $key => $value) {
+                if (in_array($section.'.'.$key, $hiddenSettingEndpoints, true)) {
+                    continue;
+                }
+
                 $endpoints[] = [
                     'section' => $section,
                     'key' => $key,
-                    'name' => $this->settingLabels()[$section][$key],
+                    'name' => SettingsService::labels()[$section][$key],
                     'value' => $value,
-                    'url' => route('api.settings.show', [$section, $key]),
+                    'url' => route('api.settings.show', [$dashboard, $section, $key]),
                 ];
             }
         }
 
+        $apiRoutes = collect(Route::getRoutes())->filter(fn ($route): bool => str_starts_with($route->uri(), 'api/'))
+            ->map(function ($route) use ($dashboard, $settings): array {
+                $parameters = [
+                    'dashboard' => $dashboard,
+                    'section' => array_key_first($settings),
+                    'key' => array_key_first($settings[array_key_first($settings)] ?? []),
+                ];
+
+                return [
+                    'methods' => array_values(array_diff($route->methods(), ['HEAD'])),
+                    'uri' => $route->uri(),
+                    'name' => $route->getName(),
+                    'middleware' => $route->gatherMiddleware(),
+                    'url' => $route->getName() ? route($route->getName(), array_intersect_key($parameters, array_flip($route->parameterNames()))) : url($route->uri()),
+                    'action' => $route->getActionName(),
+                ];
+            })
+            ->values()
+            ->all();
+
         return view('settings.api', [
             'settings' => $settings,
             'endpoints' => $endpoints,
+            'apiRoutes' => $apiRoutes,
             'ip' => request()->getHost(),
+            'shellKey' => $dashboard->shell_key,
+            'shellResolveEndpoint' => [
+                'name' => 'Подключение клиентского shell',
+                'url' => route('api.shell.resolve'),
+                'request' => ['shell_key' => $dashboard->shell_key],
+                'response' => [
+                    'dashboard' => [
+                        'id' => $dashboard->id,
+                        'name' => $dashboard->name,
+                        'slug' => $dashboard->slug,
+                        'status' => $dashboard->status,
+                        'plan' => $dashboard->plan,
+                    ],
+                    'api' => [
+                        'products_url' => route('api.products.index', $dashboard),
+                        'tariffs_url' => route('api.tariffs.index', $dashboard),
+                    'auth_login_url' => route('api.auth.login'),
+                    ],
+                ],
+            ],
+            'authEndpoint' => [
+                'name' => 'Авторизация клиента клуба',
+                'url' => route('api.auth.login'),
+                'request' => [
+                    'shell_key' => $dashboard->shell_key,
+                    'login' => '77001234567',
+                    'password' => 'secret123',
+                ],
+                'response' => [
+                    'dashboard' => [
+                        'id' => $dashboard->id,
+                        'name' => $dashboard->name,
+                        'slug' => $dashboard->slug,
+                    ],
+                    'member' => [
+                        'id' => 1,
+                        'status' => 'active',
+                        'balance' => 1500,
+                        'bonus_balance' => 200,
+                        'user' => [
+                            'id' => 2,
+                            'name' => 'Client Name',
+                            'phone' => '77001234567',
+                            'email' => 'client@example.com',
+                        ],
+                    ],
+                ],
+            ],
             'productEndpoint' => [
                 'name' => 'Товары для мобильного приложения',
-                'url' => route('api.products.index'),
+                'url' => route('api.products.index', $dashboard),
                 'response' => [
                     'data' => [[
                         'id' => 1,
@@ -53,35 +154,42 @@ class SettingsController extends Controller
                         'name' => 'Coca-Cola 0,5 л',
                         'category' => 'Напитки',
                         'price' => 650,
-                        'currency' => 'KZT',
+                        'currency' => $settings['finances']['currency'] ?? 'KZT',
                         'quantity' => 48,
                         'in_stock' => true,
                         'image_url' => request()->root().'/images/product-placeholder.svg',
                     ]],
                 ],
             ],
+            'tariffEndpoint' => [
+                'name' => 'Тарифы по зонам',
+                'url' => route('api.tariffs.index', $dashboard),
+                'response' => $tariffs->payload($dashboard),
+            ],
         ]);
     }
 
-    public function showSetting(Request $request, string $section, string $key)
+    public function showSetting(Request $request, Dashboard $dashboard, string $section, string $key): JsonResponse
     {
-        $settings = $this->loadSettings();
+        $settings = SettingsService::load($dashboard);
 
         abort_unless(array_key_exists($section, $settings), 404);
         abort_unless(array_key_exists($key, $settings[$section]), 404);
 
         return response()->json([
             'ip' => $request->getHost(),
+            'dashboard' => $dashboard->slug,
             'setting' => $section.'.'.$key,
-            'name' => $this->settingLabels()[$section][$key],
+            'name' => SettingsService::labels()[$section][$key],
             'value' => $settings[$section][$key],
         ]);
     }
 
-    public function save(Request $request)
+    public function save(Request $request): RedirectResponse
     {
         $section = $request->input('section', 'club');
-        $settings = $this->loadSettings();
+        $dashboard = $this->dashboard($request);
+        $settings = SettingsService::load($dashboard);
         $settings[$section] = $settings[$section] ?? [];
 
         $fields = [
@@ -93,6 +201,12 @@ class SettingsController extends Controller
             ],
             'finances' => [
                 'currency',
+            ],
+            'tariffs' => [
+                'standard_hour_price',
+                'vip_hour_price',
+                'night_package_price',
+                'minimum_session_minutes',
             ],
             'guests' => [
                 'show_qr_code_on_login',
@@ -117,64 +231,45 @@ class SettingsController extends Controller
             }
         }
 
-        Storage::put('settings.json', json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        if ($section === 'tariffs') {
+            $allowedZoneIds = $dashboard->clubZones()->whereHas('computers')->pluck('id')->map(fn (int $id): string => (string) $id)->all();
+            $zoneTariffs = [];
+
+            $requestedZoneTariffs = $request->input('zones', []);
+
+            foreach (is_array($requestedZoneTariffs) ? $requestedZoneTariffs : [] as $zoneId => $tariffs) {
+                if (! in_array((string) $zoneId, $allowedZoneIds, true) || ! is_array($tariffs)) {
+                    continue;
+                }
+
+                $items = [];
+                $requestedTariffs = $tariffs['tariffs'] ?? [];
+
+                foreach (is_array($requestedTariffs) ? $requestedTariffs : [] as $tariff) {
+                    if (! is_array($tariff) || trim((string) ($tariff['name'] ?? '')) === '') {
+                        continue;
+                    }
+
+                    $items[] = [
+                        'name' => trim((string) $tariff['name']),
+                        'price' => (string) max(0, (float) ($tariff['price'] ?? 0)),
+                        'duration_minutes' => (string) max(1, (int) ($tariff['duration_minutes'] ?? 60)),
+                    ];
+                }
+
+                $zoneTariffs[(string) $zoneId] = $items;
+            }
+
+            $settings['tariffs']['zones'] = $zoneTariffs;
+        }
+
+        SettingsService::save($dashboard, $settings);
 
         return back()->with('status', 'Настройки сохранены');
     }
 
-    private function loadSettings(): array
+    private function dashboard(Request $request): Dashboard
     {
-        if (!Storage::exists('settings.json')) {
-            return $this->defaultSettings();
-        }
-
-        $contents = Storage::get('settings.json');
-
-        return array_replace_recursive(
-            $this->defaultSettings(),
-            json_decode($contents, true) ?: [],
-        );
-    }
-
-    private function defaultSettings(): array
-    {
-        return [
-            'club' => [
-                'session_idle_timeout' => '15 минут',
-                'pc_restart_after_session_end' => '30 секунд',
-                'session_auto_terminate_when_pc_unavailable' => '5 минут',
-                'booking_interval' => '30 минут',
-            ],
-            'finances' => [
-                'currency' => 'KZT',
-            ],
-            'guests' => [
-                'show_qr_code_on_login' => false,
-                'allow_guest_self_transfer' => false,
-                'allow_adding_friends' => false,
-                'allow_balance_transfer_to_friends' => false,
-            ],
-        ];
-    }
-
-    private function settingLabels(): array
-    {
-        return [
-            'club' => [
-                'session_idle_timeout' => 'Время завершения сессии при бездействии',
-                'pc_restart_after_session_end' => 'Время перезагрузки ПК после завершения сессии',
-                'session_auto_terminate_when_pc_unavailable' => 'Время до автоматического завершения сессии при недоступности ПК',
-                'booking_interval' => 'Интервал между бронированиями',
-            ],
-            'finances' => [
-                'currency' => 'Валюта',
-            ],
-            'guests' => [
-                'show_qr_code_on_login' => 'Отображать QR-код на странице авторизации',
-                'allow_guest_self_transfer' => 'Разрешить самостоятельную пересадку гостя',
-                'allow_adding_friends' => 'Возможность добавления в друзья',
-                'allow_balance_transfer_to_friends' => 'Разрешить перевод баланса друзьям',
-            ],
-        ];
+        return $request->user()->dashboard ?? $this->createDashboard->handle($request->user());
     }
 }

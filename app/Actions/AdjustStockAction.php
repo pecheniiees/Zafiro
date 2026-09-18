@@ -2,40 +2,51 @@
 
 namespace App\Actions;
 
-use App\Models\Product;
+use App\Models\Dashboard;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AdjustStockAction
 {
-    public function handle(array $data, ?int $userId): StockMovement
+    public function handle(Dashboard $dashboard, array $data, ?int $userId): StockMovement
     {
-        return DB::transaction(function () use ($data, $userId): StockMovement {
-            $product = Product::query()
+        $validatedData = validator($data, [
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'type' => ['required', 'string', 'in:'.StockMovement::TYPE_RECEIPT.','.StockMovement::TYPE_WRITE_OFF],
+            'note' => ['nullable', 'string', 'max:255'],
+        ])->validate();
+
+        return DB::transaction(function () use ($dashboard, $validatedData, $userId): StockMovement {
+            $product = $dashboard->products()
                 ->lockForUpdate()
-                ->findOrFail($data['product_id']);
+                ->find($validatedData['product_id']);
 
-            $quantity = (int) $data['quantity'];
+            if (! $product) {
+                throw ValidationException::withMessages(['product_id' => 'Товар не найден в этом dashboard.']);
+            }
 
-            if ($data['type'] === StockMovement::TYPE_WRITE_OFF && $quantity > $product->quantity) {
+            $quantity = (int) $validatedData['quantity'];
+
+            if ($validatedData['type'] === StockMovement::TYPE_WRITE_OFF && $quantity > $product->quantity) {
                 throw ValidationException::withMessages([
                     'quantity' => 'Нельзя списать больше, чем есть на складе.',
                 ]);
             }
 
-            $product->quantity += $data['type'] === StockMovement::TYPE_RECEIPT
+            $product->quantity += $validatedData['type'] === StockMovement::TYPE_RECEIPT
                 ? $quantity
                 : -$quantity;
             $product->save();
 
-            return StockMovement::create([
+            return $dashboard->stockMovements()->create([
                 'product_id' => $product->id,
                 'user_id' => $userId,
-                'type' => $data['type'],
+                'type' => $validatedData['type'],
                 'quantity' => $quantity,
                 'balance_after' => $product->quantity,
-                'note' => $data['note'] ?? null,
+                'note' => $validatedData['note'] ?? null,
             ]);
         });
     }

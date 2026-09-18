@@ -6,9 +6,10 @@ use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['sku', 'name', 'category', 'price', 'quantity'])]
+#[Fillable(['dashboard_id', 'sku', 'name', 'category', 'price', 'quantity'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -20,6 +21,11 @@ class Product extends Model
             'price' => 'decimal:2',
             'quantity' => 'integer',
         ];
+    }
+
+    public function dashboard(): BelongsTo
+    {
+        return $this->belongsTo(Dashboard::class);
     }
 
     public function stockMovements(): HasMany

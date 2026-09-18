@@ -21,6 +21,10 @@
             <i class="fas fa-map-location-dot w-5 text-center"></i>
             <span>Карта зала</span>
         </a>
+        <a href="{{ route('club-members.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('club-members.*') ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }} rounded-lg font-medium transition">
+            <i class="fas fa-users w-5 text-center"></i>
+            <span>Пользователи</span>
+        </a>
         <a href="{{ route('cash-register.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('cash-register.*') ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }} rounded-lg font-medium transition">
             <i class="fas fa-cash-register w-5 text-center"></i>
             <span>Касса</span>

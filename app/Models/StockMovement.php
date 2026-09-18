@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['product_id', 'user_id', 'type', 'quantity', 'balance_after', 'note'])]
+#[Fillable(['dashboard_id', 'product_id', 'user_id', 'type', 'quantity', 'balance_after', 'note'])]
 class StockMovement extends Model
 {
     public const TYPE_RECEIPT = 'receipt';
@@ -19,6 +19,11 @@ class StockMovement extends Model
             'quantity' => 'integer',
             'balance_after' => 'integer',
         ];
+    }
+
+    public function dashboard(): BelongsTo
+    {
+        return $this->belongsTo(Dashboard::class);
     }
 
     public function product(): BelongsTo

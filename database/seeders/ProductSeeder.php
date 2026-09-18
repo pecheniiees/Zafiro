@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Dashboard;
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,7 +16,7 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::upsert([
+        $products = [
             ['sku' => 'DRK-001', 'name' => 'Coca-Cola 0,5 л', 'category' => 'Напитки', 'price' => 650, 'quantity' => 48],
             ['sku' => 'DRK-002', 'name' => 'Red Bull 0,25 л', 'category' => 'Напитки', 'price' => 950, 'quantity' => 32],
             ['sku' => 'DRK-003', 'name' => 'Вода BonAqua 0,5 л', 'category' => 'Напитки', 'price' => 400, 'quantity' => 60],
@@ -26,6 +27,12 @@ class ProductSeeder extends Seeder
             ['sku' => 'ACC-003', 'name' => 'Гарнитура HyperX Cloud II', 'category' => 'Аксессуары', 'price' => 48_000, 'quantity' => 6],
             ['sku' => 'ACC-004', 'name' => 'Коврик SteelSeries QcK', 'category' => 'Аксессуары', 'price' => 9_000, 'quantity' => 20],
             ['sku' => 'ACC-005', 'name' => 'Кабель HDMI 2 м', 'category' => 'Аксессуары', 'price' => 3_500, 'quantity' => 12],
-        ], ['sku'], ['name', 'category', 'price', 'quantity']);
+        ];
+
+        Dashboard::query()->get(['id'])->each(function (Dashboard $dashboard) use ($products): void {
+            Product::query()->insertOrIgnore(
+                array_map(fn (array $product): array => ['dashboard_id' => $dashboard->id] + $product, $products),
+            );
+        });
     }
 }

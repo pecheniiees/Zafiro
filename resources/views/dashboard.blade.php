@@ -3,315 +3,209 @@
 @section('page-title', 'Админпанель')
 
 @section('content')
-<div class="p-6 lg:p-8">
-                <!-- Welcome Section -->
-                <div class="mb-8 animate-slide">
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        Добро пожаловать, {{ Auth::user()->name }}! 👋
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Вот краткая информация о вашем бизнесе
-                    </p>
+<div class="space-y-6 p-6 lg:p-8">
+    <section class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-purple-600 dark:text-purple-400">{{ $dashboard->name }}</p>
+                <h3 class="mt-1 text-3xl font-bold text-gray-900 dark:text-white">Добро пожаловать, {{ Auth::user()->name }}!</h3>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Живая сводка по текущему клубу: касса, клиенты, склад и карта зала.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/40">
+                    <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Slug</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{{ $dashboard->slug }}</p>
                 </div>
-
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Total Sales -->
-                    <div class="stat-card bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.1s">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Sales</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">$12,345</p>
-                            </div>
-                            <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-shopping-cart text-purple-600 dark:text-purple-400 text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-green-600 text-sm">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>20% от прошлого месяца</span>
-                        </div>
-                    </div>
-
-                    <!-- Total Expense -->
-                    <div class="stat-card bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.2s">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expense</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">$3,213</p>
-                            </div>
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-credit-card text-blue-600 dark:text-blue-400 text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-red-600 text-sm">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>8% от прошлого месяца</span>
-                        </div>
-                    </div>
-
-                    <!-- Total Orders -->
-                    <div class="stat-card bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.3s">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">342</p>
-                            </div>
-                            <div class="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-boxes text-green-600 dark:text-green-400 text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-green-600 text-sm">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>15% от прошлого месяца</span>
-                        </div>
-                    </div>
-
-                    <!-- Total Revenue -->
-                    <div class="stat-card bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.4s">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Net Revenue</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">$9,132</p>
-                            </div>
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900 dark:to-orange-800 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-chart-line text-orange-600 dark:text-orange-400 text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-green-600 text-sm">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>12% от прошлого месяца</span>
-                        </div>
-                    </div>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/40">
+                    <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Тариф</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{{ ucfirst($dashboard->plan) }}</p>
                 </div>
-
-                <!-- Charts Row -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- Main Chart -->
-                    <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.5s">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Sales & Purchases</h3>
-                        <canvas id="chart" style="max-height: 300px;"></canvas>
-                    </div>
-
-                    <!-- Quick Stats -->
-                    <div class="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.6s">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Stats</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Completion Rate</span>
-                                    <span class="text-sm font-bold text-purple-600">87%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                                    <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full" style="width: 87%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Customer Satisfaction</span>
-                                    <span class="text-sm font-bold text-blue-600">92%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full" style="width: 92%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">On-Time Delivery</span>
-                                    <span class="text-sm font-bold text-green-600">95%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                                    <div class="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full" style="width: 95%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 dark:border-green-900/60 dark:bg-green-900/10">
+                    <p class="text-xs font-medium uppercase text-green-700 dark:text-green-300">Статус</p>
+                    <p class="mt-1 text-sm font-semibold text-green-700 dark:text-green-300">{{ ucfirst($dashboard->status) }}</p>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Recent Invoice -->
-                <div class="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 animate-slide" style="animation-delay: 0.7s">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Recent Invoice</h3>
-                        <a href="#" class="text-purple-600 hover:text-purple-700 dark:text-purple-400 text-sm font-medium">View All →</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="border-b border-gray-200 dark:border-gray-800">
-                                <tr>
-                                    <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Invoice</th>
-                                    <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Date</th>
-                                    <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Amount</th>
-                                    <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Status</th>
-                                    <th class="text-right py-3 font-semibold text-gray-700 dark:text-gray-300">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-medium">#INV001</td>
-                                    <td class="py-4 text-gray-600 dark:text-gray-400">2026-08-05</td>
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-semibold">$1,200</td>
-                                    <td class="py-4">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-check-circle"></i> Paid
-                                        </span>
-                                    </td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                            <i class="fas fa-ellipsis-h"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-medium">#INV002</td>
-                                    <td class="py-4 text-gray-600 dark:text-gray-400">2026-08-04</td>
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-semibold">$850</td>
-                                    <td class="py-4">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-clock"></i> Pending
-                                        </span>
-                                    </td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                            <i class="fas fa-ellipsis-h"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-medium">#INV003</td>
-                                    <td class="py-4 text-gray-600 dark:text-gray-400">2026-08-03</td>
-                                    <td class="py-4 text-gray-900 dark:text-gray-100 font-semibold">$2,100</td>
-                                    <td class="py-4">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-check-circle"></i> Paid
-                                        </span>
-                                    </td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                            <i class="fas fa-ellipsis-h"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    <section class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div class="stat-card animate-slide rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Выручка сегодня</p>
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['today_income'], 0, ',', ' ') }} KZT</p>
                 </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300">
+                    <i class="fas fa-cash-register"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card animate-slide rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Чистый месяц</p>
+                    <p class="mt-2 text-2xl font-bold {{ $stats['month_net'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">{{ number_format($stats['month_net'], 0, ',', ' ') }} KZT</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-300">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card animate-slide rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Пользователи клуба</p>
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['club_members'] }}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Активные: {{ $stats['active_members'] }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card animate-slide rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">ПК в зале</p>
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['computers'] }}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Включены: {{ $stats['computers_on'] }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
+                    <i class="fas fa-desktop"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 xl:col-span-2">
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Касса за 7 дней</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Доходы и расходы текущего клуба.</p>
+                </div>
+            </div>
+            <canvas id="dashboardCashChart" class="max-h-80"></canvas>
+        </div>
+
+        <div class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Оперативно</h3>
+            <div class="mt-5 space-y-4">
+                <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Зоны</span>
+                        <span class="font-bold text-purple-600 dark:text-purple-400">{{ $stats['zones'] }}</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-800"><div class="h-2 rounded-full bg-purple-600" style="width: {{ min(100, $stats['zones'] * 10) }}%"></div></div>
+                </div>
+                <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Бронь ПК</span>
+                        <span class="font-bold text-blue-600 dark:text-blue-400">{{ $stats['computers_reserved'] }}</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-800"><div class="h-2 rounded-full bg-blue-600" style="width: {{ $stats['computers'] ? min(100, round($stats['computers_reserved'] / $stats['computers'] * 100)) : 0 }}%"></div></div>
+                </div>
+                <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Тех обслуживание</span>
+                        <span class="font-bold text-amber-600 dark:text-amber-400">{{ $stats['computers_maintenance'] }}</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-800"><div class="h-2 rounded-full bg-amber-500" style="width: {{ $stats['computers'] ? min(100, round($stats['computers_maintenance'] / $stats['computers'] * 100)) : 0 }}%"></div></div>
+                </div>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/40">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Баланс клиентов</p>
+                    <p class="mt-1 text-xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['member_balance'], 0, ',', ' ') }} KZT</p>
+                    <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Бонусы: {{ number_format($stats['member_bonus_balance'], 0, ',', ' ') }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 xl:col-span-2">
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Последние операции кассы</h3>
+                <a href="{{ route('cash-register.index') }}" class="text-sm font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400">К кассе</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @forelse ($recentTransactions as $transaction)
+                            <tr>
+                                <td class="py-3 font-medium text-gray-900 dark:text-gray-100">{{ $transaction->description ?: 'Операция кассы' }}</td>
+                                <td class="py-3 text-gray-500 dark:text-gray-400">{{ $transaction->created_at->format('d.m H:i') }}</td>
+                                <td class="py-3 text-right font-semibold {{ $transaction->type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">{{ $transaction->type === 'income' ? '+' : '-' }}{{ number_format((float) $transaction->amount, 0, ',', ' ') }} KZT</td>
+                            </tr>
+                        @empty
+                            <tr><td class="py-8 text-center text-gray-500 dark:text-gray-400" colspan="3">Операций кассы пока нет.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Низкие остатки</h3>
+                <a href="{{ route('warehouse') }}" class="text-sm font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400">Склад</a>
+            </div>
+            <div class="space-y-3">
+                @forelse ($lowStockProducts as $product)
+                    <div class="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-950/40">
+                        <span class="font-medium text-gray-900 dark:text-gray-100">{{ $product->name }}</span>
+                        <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">{{ $product->quantity }}</span>
+                    </div>
+                @empty
+                    <p class="rounded-lg bg-gray-50 px-3 py-6 text-center text-sm text-gray-500 dark:bg-gray-950/40 dark:text-gray-400">Критичных остатков нет.</p>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <section class="animate-slide rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+        <h3 class="mb-5 text-lg font-bold text-gray-900 dark:text-white">Последние движения склада</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    @forelse ($recentMovements as $movement)
+                        <tr>
+                            <td class="py-3 font-medium text-gray-900 dark:text-gray-100">{{ $movement->product->name }}</td>
+                            <td class="py-3 font-semibold {{ $movement->type === 'receipt' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">{{ $movement->type === 'receipt' ? 'Оприходование' : 'Списание' }}</td>
+                            <td class="py-3 text-right text-gray-700 dark:text-gray-300">{{ $movement->quantity }} шт.</td>
+                            <td class="py-3 text-right text-gray-500 dark:text-gray-400">{{ $movement->created_at->format('d.m H:i') }}</td>
+                        </tr>
+                    @empty
+                        <tr><td class="py-8 text-center text-gray-500 dark:text-gray-400" colspan="4">Движений склада пока нет.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.getElementById('overlay');
-
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
-    }
-
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-    }
-
-    const userMenuBtn = document.getElementById('userMenuBtn');
-    const userMenu = document.getElementById('userMenu');
-
-    if (userMenuBtn) {
-        userMenuBtn.addEventListener('click', () => {
-            userMenu.classList.toggle('active');
-        });
-    }
-
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.relative')) {
-            userMenu?.classList.remove('active');
-        }
-    });
-
-    const chartElement = document.getElementById('chart');
+    const chartElement = document.getElementById('dashboardCashChart');
     if (chartElement) {
-        const ctx = chartElement.getContext('2d');
-        new Chart(ctx, {
+        new Chart(chartElement.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: @json($chart['labels']),
                 datasets: [
-                    {
-                        label: 'Sales Target',
-                        data: [5000, 6000, 5500, 6500, 7000],
-                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                        borderColor: 'rgba(168, 85, 247, 0.5)',
-                        borderWidth: 1,
-                        borderRadius: 8
-                    },
-                    {
-                        label: 'Sales',
-                        data: [4200, 5100, 4800, 5900, 6200],
-                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
-                        borderColor: 'rgba(168, 85, 247, 1)',
-                        borderWidth: 1,
-                        borderRadius: 8
-                    },
-                    {
-                        label: 'Purchases',
-                        data: [3000, 3500, 3200, 3800, 4100],
-                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                        borderColor: 'rgba(239, 68, 68, 1)',
-                        borderWidth: 1,
-                        borderRadius: 8
-                    }
-                ]
+                    {label: 'Доход', data: @json($chart['income']), backgroundColor: 'rgba(34, 197, 94, 0.8)', borderRadius: 6},
+                    {label: 'Расход', data: @json($chart['expense']), backgroundColor: 'rgba(239, 68, 68, 0.75)', borderRadius: 6},
+                ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            color: '#6b7280',
-                            font: {
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 7000,
-                        ticks: {
-                            stepSize: 1000,
-                            color: '#9ca3af',
-                            font: {
-                                size: 11
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(209, 213, 219, 0.1)'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#9ca3af',
-                            font: {
-                                size: 11
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
+                plugins: {legend: {position: 'bottom'}},
+                scales: {y: {beginAtZero: true}, x: {grid: {display: false}}},
+            },
         });
     }
 </script>
